@@ -75,22 +75,16 @@ Trex.Attacher.Image = Trex.Class.create({
 		
 	},
 	getKey: function(data) {
-		return data.imageurl;
+		return data.base64Image;
 	},
 	getDataForEntry: function(data) {
-		data.imageurl = this.encodeSpaceInUrl(data.imageurl);
-		data.originalurl = this.encodeSpaceInUrl(data.originalurl);
-		data.attachurl = this.encodeSpaceInUrl(data.attachurl);
-		data.thumburl = data.thumburl || data.imageurl.replace(/\/image\//gm, '/P150x100/');
-		  
+
 		if(!data.dispElId) {
 			data.dispElId = Trex.Util.getDispElId();
 		}
-		var _seq = ((data.tmpSeq)? this.entryBox.syncSeq(data.tmpSeq): this.entryBox.newSeq());
-		var _data = Object.extend({ 
-			dataSeq: _seq
-		}, data); //NOTE: Cuz IE
-		return _data;
+
+
+		return data;
 	},
 	createEntry: function(data, type) {
 		return this.createAttachment(data, type);
@@ -132,14 +126,14 @@ Trex.Attachment.Image = Trex.Class.create({
 	$extend: Trex.Attachment,
 	getFieldAttr: function(data) {
 		return {
-			name: 'tx_attach_image', 
+			name: 'tx_attach_image',
 			value: [data.thumburl, data.imageurl, data.originalurl, data.exifurl, data.filename, data.filesize].join('|')
 		};
 	},
 	getBoxAttr: function(data) {
-		var _rectangle = data.width ? data.width + "x" + data.height + " / " : ""; 
+		var _rectangle = data.width ? data.width + "x" + data.height + " / " : "";
 		return {
-			name: data.filename + " (" +  _rectangle + data.filesize.toByteUnit() + ")",
+			name: data.filename + " (" +  _rectangle + data.size + ")",
 			image: data.thumburl
 		};
 	},
@@ -206,18 +200,26 @@ Trex.Attachment.Image = Trex.Class.create({
 		return "<img src=\"" + data.imageurl + "\" class=\"txc-image\"/>";
 	},
 	getDispHtml: function(data) {
-		return "<img id=\"" + data.dispElId + "\" src=\"" + data.imageurl + "\" class=\"txc-image\"/>";
+		return "<img id=\"" + data.dispElId + "\" src=\"" + data.base64Image + "\" class=\"txc-image\"/>";
 	},
 	getDispText: function(data) {
 		return "<img src=\"" + data.imageurl + "\" class=\"txc-image\"/>";
 	},
+	/*
+		base 64 이미지가 있는지 확인
+	*/
+	getbase64Load: function(data) {
+		return (data.base64Image != undefined)
+	},
 	getRegLoad: function(data) {
-		return new RegExp("<(?:img|IMG)[^>]*src=\"?" + data.imageurl.getRegExp() + "\"?[^>]*\/?>", "gim");
+		return new RegExp("<(?:img|IMG)[^>]*src=\"?" + data.name.getRegExp() + "\"?[^>]*\/?>", "gim");
 	},
 	getRegHtml: function(data) {
-		return new RegExp("<(?:img|IMG)[^>]*src=\"?" + data.imageurl.getRegExp() + "\"?[^>]*\/?>", "gim");
-	}, 
+		return new RegExp("<(?:img|IMG)[^>]*src=\"?" + data.name.getRegExp() + "\"?[^>]*\/?>", "gim");
+		// return data;
+	},
 	getRegText: function(data) {
-		return new RegExp("<(?:img|IMG)[^>]*src=\"?" + data.imageurl.getRegExp() + "\"?[^>]*\/?>", "gim");
+		// return data;
+		return new RegExp("<(?:img|IMG)[^>]*src=\"?" + data.name.getRegExp() + "\"?[^>]*\/?>", "gim");
 	}
 });

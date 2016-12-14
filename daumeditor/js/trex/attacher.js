@@ -90,49 +90,36 @@ Trex.Attacher = Trex.Class.draft(/** @lends Trex.Attacher.prototype */{
 	},
 	/**
 	 * Attacher를 실행, 첨부를 하기 위한 popup window를 띄워주거나 필요한 action을 수행한다.
-	 * @param {String} param - 팝업을 띄울때 추가할 파라미터 문자열 
+	 * @param {String} param - 팝업을 띄울때 추가할 파라미터 문자열
 	 * @function
 	 */
 	execute: function(param) {
-		if(this.wysiwygonly && !this.canvas.isWYSIWYG()) {
-			alert(TXMSG("@attacher.insert.alert"));
-			return;
-		}
 
-		if(this.isCheckSize && !this.entryBox.checkAvailableCapacity()) {
-			alert(TXMSG("@attacher.capacity.alert"));
-			return;
-		}
+		var self = this;
 
-		if(!this.checkInsertable()) {
-			if(this.canModified) {
-				var _jstObj = new Template( TXMSG("@attacher.can.modify.alert") );
-				alert( _jstObj.evaluate( {title : this.title}));
-			} else {
-				var _jstObj = new Template( TXMSG("@attacher.can.modify.confirm") );
-				if(!confirm(_jstObj.evaluate({ title : this.title }))) {
-					return;
-				}
-			}
-		}
-		if(this.clickHandler) {
-			this.clickHandler();
-		} else {
-			try {
-				var _url = this.config.popPageUrl;
-				if(param) {
-					_url = _url + ((_url.indexOf("?") > -1) ? "&" : "?") + param;
-				}
-                var isDocumentDomainDeclaredExplicitly = (document.location.hostname != document.domain);
-                if (isDocumentDomainDeclaredExplicitly) {
-                    _url = _url + ((_url.indexOf("?") > -1) ? "&" : "?") + "xssDomain=" + document.domain;
-                }
+		/*
+			사진 버튼을 누르면 file Explore가 나타난다.
+		 */
+  	var inputFile = document.querySelector('input[type="file"]');
+  	inputFile.click();
 
-				_url = (this.pvUrl? this.pvUrl + ((this.pvUrl.indexOf("?") > -1) ? "&" : "?") + "u="+escape(_url): _url);
-				var win = _WIN.open(_url, "at" + this.name, this.config.features);
-				win.focus();
-			} catch (e) {}
-		}
+  	/*
+  		File Explore에서 이미지를 선택하면 해당 이미지를 base64로 변경하여
+  		기존의 file object에 추가하여 execAttach 함수에 보낸다.
+  	 */
+  	inputFile.addEventListener('change', function (){
+
+      var files = inputFile.files[0];
+	    var FR = new FileReader();
+	    console.log(files)
+	    FR.onload = function(e) {
+	    	files.base64Image = e.target.result;
+	      self.execAttach(files,  "image");
+	    };
+
+	    FR.readAsDataURL( this.files[0] );
+
+    });
 	},
 	/**
 	 * Argument의 data를 이용해서 editor에 첨부하며, Attacher type에 때라 data의 format은 다르다.  

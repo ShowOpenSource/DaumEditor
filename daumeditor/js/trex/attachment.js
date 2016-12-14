@@ -168,6 +168,7 @@ Trex.Attachment = Trex.Class.draft(/** @lends Trex.Attachment.prototype */{
 		this.saveHtml = this.getSaveHtml.bind(this)(_data);
 		this.dispHtml = this.getDispHtml.bind(this)(_data);
 		this.dispText = this.getDispText.bind(this)(_data);
+		this.base64Load = this.getbase64Load.bind(this)(_data);
 		this.regLoad = this.getRegLoad.bind(this)(_data);
 		this.regHtml = this.getRegHtml.bind(this)(_data);
 		this.regText = this.getRegText.bind(this)(_data);
